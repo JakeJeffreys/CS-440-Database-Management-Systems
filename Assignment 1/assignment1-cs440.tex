@@ -1,0 +1,84 @@
+%=======================02-713 LaTeX template, following the 15-210 template==================
+%
+% You don't need to use LaTeX or this template, but you must turn your homework in as
+% a typeset PDF somehow.
+%
+% How to use:
+%    1. Update your information in section "A" below
+%    2. Write your answers in section "B" below. Precede answers for all
+%       parts of a question with the command "\question{n}{desc}" where n is
+%       the question number and "desc" is a short, one-line description of
+%       the problem. There is no need to restate the problem.
+%    3. If a question has multiple parts, precede the answer to part x with the
+%       command "\part{x}".
+%    4. If a problem asks you to design an algorithm, use the commands
+%       \algorithm, \correctness, \runtime to precede your discussion of the
+%       description of the algorithm, its correctness, and its running time, respectively.
+%    5. You can include graphics by using the command \includegraphics{FILENAME}
+%
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{comment}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\headheight}{13.6pt}
+\newcommand\question[2]{\vspace{.25in}\hrule\textbf{#1: #2}\vspace{.5em}\hrule\vspace{.10in}}
+\renewcommand\part[1]{\vspace{.10in}\textbf{(#1)}}
+\newcommand\algorithm{\vspace{.10in}\textbf{Algorithm: }}
+\newcommand\correctness{\vspace{.10in}\textbf{Correctness: }}
+\newcommand\runtime{\vspace{.10in}\textbf{Running time: }}
+\pagestyle{fancyplain}
+\lhead{\textbf{\NAME\ \ANDREWID}}
+\chead{\textbf{Assignment \HWNUM}}
+\rhead{CS 440, Winter 2018}
+\begin{document}\raggedright
+%Section A==============Change the values below to match your information==================
+\newcommand\NAME{Nicholas Jake Jeffreys}  % your name
+\newcommand\ANDREWID{932-221-702}     % your andrew id
+\newcommand\HWNUM{1}              % the homework number
+%Section B==============Put your answers to the questions below here=======================
+
+% no need to restate the problem --- the graders know which problem is which,
+% but replacing "The First Problem" with a short phrase will help you remember
+% which problem this is when you read over your homeworks to study.
+The assignment is to be turned in before Midnight (by 11:59pm) on January 18th. You should turn in the solutions to this assignment as a PDF file through the TEACH website. The solutions should be produced using editing software programs, such as LaTeX or Word, otherwise they will not be graded.
+
+\question{1}{Relational Model and SQL (8 points)}
+Consider the following relational  schema:\\
+
+Emp(\underline{{\it eid}:integer}, {\it ename}:string, {\it age}:integer, {\it salary}:real)\\
+Works(\underline{{\it eid}:integer}, \underline{{\it did}:integer}, {\it pc\_time}:integer)\\
+Dept(\underline{{\it did}:integer}, {\it dname}:string, {\it budget}:real, {\it managerid}:integer)\\
+\vspace{10pt}
+
+The underlined attributes are keys for their relations.
+Note that a manager is an employee as well and their manager id and employee id are the same.
+An employee can work in more than one department.
+The pct\_time field of the Works relation shows the percentage of time that a given employee works in a given department.
+Write the following queries in SQL.
+
+
+\part{a} Print the {\it did} and {\it dname} of the departments with at least one full-time (100\%) employee. (1 point)\\
+\part{solution}\\
+SELECT DISTINCT D.did, dname FROM dept D, works W WHERE D.did=W.did AND pct\_time=100
+
+\part{b} Print the names and ages of each employee who works in both the "Hardware" department and the "Software" department. (1 point)\\
+\part{solution}\\
+SELECT ename, age FROM emp E, works W, dept D WHERE E.eid=W.eid AND W.did=D.did AND dname='Software' AND ename IN (SELECT ename FROM emp E, works W, dept D WHERE E.eid=W.eid AND W.did=D.did AND dname='Hardware')
+
+\part{c} Print the name of each employee whose salary does {\it not} exceed the budget of any department that he or she works in. (2 point)\\
+\part{solution}\\
+SELECT ename FROM emp WHERE ename NOT IN (SELECT ename FROM emp E, works W, dept D WHERE E.eid=W.eid AND W.did=D.did AND E.salary $>$ D.budget)
+
+\part{d} If a manager manages more than one department, he or she controls the sum of all the budgets for those departments. Find the managerids of managers who control more than \$5 million. (2 points)\\
+\part{solution}\\
+SELECT managerid FROM (SELECT managerid, SUM(budget) AS bsum FROM dept GROUP BY managerid) T WHERE bsum $>$ 5000000
+
+\part{e} For each department with more than 4 full-time-equivalent employees (i.e., where the part-time and full-time employees add up to at least that many full-time employees), print the did together with the number of employees that work in that department. (2 points)\\
+\part{solution}\\
+SELECT did, count FROM (SELECT did, SUM(pct\_time) AS sum, COUNT(eid) AS count FROM works GROUP BY did) T WHERE sum $>$ 400
+
+\end{document}

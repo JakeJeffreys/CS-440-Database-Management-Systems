@@ -1,0 +1,121 @@
+%=======================02-713 LaTeX template, following the 15-210 template==================
+%
+% You don't need to use LaTeX or this template, but you must turn your homework in as
+% a typeset PDF somehow.
+%
+% How to use:
+%    1. Update your information in section "A" below
+%    2. Write your answers in section "B" below. Precede answers for all
+%       parts of a question with the command "\question{n}{desc}" where n is
+%       the question number and "desc" is a short, one-line description of
+%       the problem. There is no need to restate the problem.
+%    3. If a question has multiple parts, precede the answer to part x with the
+%       command "\part{x}".
+%    4. If a problem asks you to design an algorithm, use the commands
+%       \algorithm, \correctness, \runtime to precede your discussion of the
+%       description of the algorithm, its correctness, and its running time, respectively.
+%    5. You can include graphics by using the command \includegraphics{FILENAME}
+%
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{comment}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{caption}
+\usepackage{subcaption}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\headheight}{13.6pt}
+\newcommand\question[2]{\vspace{.25in}\hrule\textbf{#1: #2}\vspace{.5em}\hrule\vspace{.10in}}
+\renewcommand\part[1]{\vspace{.10in}\textbf{(#1)}}
+\newcommand\algorithm{\vspace{.10in}\textbf{Algorithm: }}
+\newcommand\correctness{\vspace{.10in}\textbf{Correctness: }}
+\newcommand\runtime{\vspace{.10in}\textbf{Running time: }}
+\pagestyle{fancyplain}
+\lhead{\textbf{\NAME\ \ANDREWID}}
+\chead{\textbf{Assignment \HWNUM}}
+\rhead{CS 440, Winter 2018}
+\begin{document}\raggedright
+%Section A==============Change the values below to match your information==================
+\newcommand\NAME{Nicholas Jake Jeffreys}  % your name
+\newcommand\ANDREWID{932-221-702}     % your andrew id
+\newcommand\HWNUM{3}              % the homework number
+%Section B==============Put your answers to the questions below here=======================
+
+% no need to restate the problem --- the graders know which problem is which,
+% but replacing "The First Problem" with a short phrase will help you remember
+% which problem this is when you read over your homeworks to study.
+
+The assignment is to be turned in before Midnight (by 11:59pm) on February 1, 2018.
+You should turn in the solutions to the first question as a pdf file through the TEACH website. You should turn in your source code
+for the second question in a single C++ source code file with cpp extension through the TEACH website.
+
+\question{1}{Query processing (3 points)}
+Consider the natural join of the relation R and S on attribute A.
+Neither relations have any indexes built on them.
+Assume that R and S have 80000 and 20000 blocks, respectively.
+The cost of a join is the number of its block I/Os accesses.
+
+\begin{enumerate}
+\item Assume that there are 300 buffer blocks available in the main memory.
+We would like to have the output of join sorted according to attribute A.
+What is the fastest join algorithm for computing the join of R and S? What is the cost of this algorithm? \\
+\vspace{3mm}
+
+If we were just joining the two then a hash join would be fastest because we wouldn't be able to use the optimized sort-merge but since the output must be sorted it is faster to use sort-merge. The cost of this algorthm is: sorting + 2B(R) + 2B(S). This comes out to: \[(80000)(log_{300}(80000))+(20000)(log_{300}(20000))+2(20000 + 80000) = 393074 \] \\
+
+\item Assume that there are 40 buffer blocks available in the main memory.
+What is the fastest join algorithm to compute the join of R and S? What is the cost of this algorithm? \\
+\vspace{3mm}
+
+Since both of the relations R and S are more the M\textsuperscript{2} (40\textsuperscript{2} = 1600) we can't use sort merge or hash join. Instead we must use a Nested block join. The cost of this is B(S) + B(R)*B(S)/M which comes out to 40,020,000. \\
+
+\item Assume that there are 200 buffer blocks available in the main memory. What is the fastest join
+algorithm to compute the join of R and S? What is the cost of this algorithm? \\
+\vspace{3mm}
+
+Similar to 1.1, we can not use the optimized sort merge but we can use a hash because 200\textsuperscript{2}=40000 which is more than our lowest relation of 20000. Again, the cost is going to be 3B(R)+3B(S) which comes out to 3(20000 + 80000) = 300000. \\
+
+\end{enumerate}
+
+
+
+\question{2}{Query processing  (4 points)}
+Consider the following relations:
+\begin{verbatim}
+Dept (did (integer), dname (string), budget (double), managerid (integer))
+Emp (eid (integer), ename (string), age (integer), salary (double))
+\end{verbatim}
+
+Fields of types \textit{integer}, \textit{double}, and \textit{string} occupy 4, 8, and 40 bytes, respectively.
+Each block can fit at most one tuple of an input relation. There are at most 22 blocks available to the join algorithm in the main memory.
+Implement the optimized sort-merge join algorithm for \textit{Dept}~$\bowtie_{Dept.managerid=Emp.eid}$~\textit{Emp} in C++.
+\begin{itemize}
+\item Each input relation is stored in a separate CSV file, i.e., each tuple is in a separate line and fields of each record are separated by commas.
+\item The result of the join must be stored in a new CSV file.
+The files that store relations Dept and Emp are Dept.csv and Emp.csv, respectively.
+\item Your program must assume that the input files are in the current working directory, i.e., the one from which your program is running.
+\item The program must store the result in a new CSV file with the name join.csv in the current working directory.
+\item Your program must run on Linux. Each student has an account on
+\textit{voltdb1.eecs.oregonstate.edu} server, which is a Linux machine. You may use this machine to test your program if you do not have access to any other Linux machine. You can use the following \textit{bash} command to connect to \textit{voltdb1}:
+\begin{verbatim}
+> ssh your_onid_username@voltdb1.eecs.oregonstate.edu
+\end{verbatim}
+Then it asks for your ONID password and probably one another question. You can only access this server on campus.
+
+\item You can use following commands to compile and run C++ code:
+
+\begin{verbatim}
+> g++ main.cpp -o main.out
+> main.out
+\end{verbatim}
+
+\end{itemize}
+
+\end{document}
